@@ -51,7 +51,7 @@ export default function AIAnalyzer() {
                     {/* Header */}
                     <div className="text-center">
                         <Title level={2} className="mb-2!">
-                            AI Analyzer
+                            mind Mirror - AI-Powered Thought Analyzer
                         </Title>
                         <Paragraph type="secondary">
                             Enter your text and get AI-powered insights instantly.
