@@ -1,23 +1,39 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
-  const { text } = await req.json();
+  try {
+    const { text } = await req.json();
 
-  const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "user",
-        content: `Analyze this:\n${text}`,
-      },
-    ],
-  });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+    });
 
-  return Response.json({
-    result: response.choices[0].message.content,
-  });
+    const prompt = `
+You are a supportive but rational thinking assistant.
+
+Analyze the user's thoughts and return:
+1. Mood
+2. Insight
+3. Control
+4. No control
+5. Actions
+
+User input:
+${text}
+`;
+
+    const result = await model.generateContent(prompt);
+    const output = result.response.text();
+
+    return Response.json({ result: output });
+  } catch (err: any) {
+    console.log(err);
+
+    return Response.json(
+      { error: err.message || "Gemini error" },
+      { status: 500 }
+    );
+  }
 }
